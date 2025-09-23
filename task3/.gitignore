@@ -1,0 +1,11 @@
+*.sqlite
+*.env
+venv/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.vscode/
+media
+db.sqlite3
+../task2

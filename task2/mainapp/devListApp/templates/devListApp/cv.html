@@ -1,0 +1,22 @@
+{% extends "devListApp/base.html"%}
+{%block content%}
+<h2>
+   username: {{pointedDev.username}}
+</h2>
+<h3>
+    firstname: {{pointedDev.firstname}}
+</h3>
+<h3>
+    lastname: {{pointedDev.last_name}}
+</h3>
+<strong>
+    <p>
+        skills:
+    </p>
+</strong>
+{%for skill in pointedDev.skills%}
+<p>
+    {{skill}}
+</p>
+{%endfor%}
+{%endblock%}

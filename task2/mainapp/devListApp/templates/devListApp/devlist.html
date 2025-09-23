@@ -1,0 +1,10 @@
+{% extends "devListApp/base.html"%}
+{%block content%}
+{%for user in devDict%}
+<a href="{% url 'show_cv' user.username %}">
+    <p>
+        {{user.username}}
+    </p>
+</a>
+{%endfor%}
+{%endblock%}    

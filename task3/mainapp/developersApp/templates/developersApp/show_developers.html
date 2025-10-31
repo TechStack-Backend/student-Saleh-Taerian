@@ -6,10 +6,15 @@
     <title>Document</title>
 </head>
 <body>
-    {%for skill in skills%}
-    <h2>{{skill.developer}}</h2>
-    <h3>{{skill.title}}</h3>
-    <h4>{{skill.description}}</h4>
+    {%for dev in developers%}
+    <h2>{{dev}}</h2>
+        {%for project in projects%}
+            {%for projectDev in project.developers.all%}
+                {%if projectDev.first_name == dev %}
+                <h3>{{project.title}}</h3>
+                {%endif%}
+            {%endfor%}
+        {%endfor%}
     {%endfor%}
 </body>
 </html>

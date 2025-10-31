@@ -194,7 +194,7 @@ class updateDeveloper(UpdateView):
     model = Developer
     template_name = "developersApp/update_dev.html"
     context_object_name = "developer"
-    fields = ["first_name", "last_name", "email", "age"]
+    form_class = developer_login
     success_url = reverse_lazy("addDev")
 
     def form_valid(self, form):
@@ -210,7 +210,7 @@ class updateProject(UpdateView):
     model = Project
     template_name = "developersApp/update_project.html"
     context_object_name = "project"
-    fields = ["title", "description"]
+    form_class = add_project
     success_url = reverse_lazy("addDev")
 
     def form_valid(self, form):
@@ -226,7 +226,7 @@ class updateSkill(UpdateView):
     model = Skill
     template_name = "developersApp/update_skill.html"
     context_object_name = "developer"
-    fields = ["title", "description"]
+    form_class = add_skill
     success_url = reverse_lazy("addDev")
 
     def form_valid(self, form):

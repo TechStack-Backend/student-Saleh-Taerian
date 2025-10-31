@@ -1,19 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from .forms import developer_login, add_project, add_skill
 from .models import Developer, Skill, Project
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView , UpdateView , DeleteView 
-from django.views.generic import TemplateView ,ListView
-from .forms import add_project , add_skill , developer_login
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, ListView
+from .forms import add_project, add_skill, developer_login
+
 # from django.contrib import messages
+
 
 class developerCreateView(CreateView):
     model = Developer
     template_name = "developersApp/add_dev.html"
     form_class = developer_login
     success_url = reverse_lazy("addDev")
-
 
 
 # def add_developer(request):
@@ -32,6 +33,7 @@ class developerCreateView(CreateView):
 #         form = developer_login()
 #     return render(request, "developersApp/add_dev.html", {"form": form})
 
+
 class projectCreateView(CreateView):
     model = Project
     form_class = add_project
@@ -39,6 +41,8 @@ class projectCreateView(CreateView):
     form_class = add_project
     success_url = reverse_lazy("addProj")
     # model.developers.set(form.cleaned_data["developers"])
+
+
 # def add_proj(request):
 #     if request.method == "POST":
 #         form = add_project(request.POST)
@@ -55,11 +59,13 @@ class projectCreateView(CreateView):
 #         form = add_project()
 #     return render(request, "developersApp/add_proj.html", {"form": form})
 
+
 class skillCreateView(CreateView):
     model = Skill
     template_name = "developersApp/add_skill.html"
     form_class = add_skill
     success_url = reverse_lazy("addSkill")
+
 
 # def add_skl(request):
 #     if request.method == "POST":
@@ -76,22 +82,31 @@ class skillCreateView(CreateView):
 #         form = add_skill()
 #     return render(request, "developersApp/add_skill.html", {"form": form})
 
+
 class developerListView(ListView):
     model = Project
     template_name = "developersApp/show_developers.html"
     context_object_name = "projects"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['developers'] = list(Developer.objects.values_list('first_name' , flat=True))
+        context["developers"] = list(
+            Developer.objects.values_list("first_name", flat=True)
+        )
         return context
+
+
 # def show_developers(request):
 #     skills = Skill.objects.all()
 #     return render(request , 'developersApp/show_developers.html',{'skills':skills})
+
 
 class projectListview(ListView):
     model = Project
     template_name = "developersApp/show_projects.html"
     context_object_name = "projects"
+
+
 # def show_projects(request):
 #     projects = Project.objects.all()
 #     return render(request , 'developersApp/show_projects.html' , {'projects':projects})
@@ -99,4 +114,70 @@ class developerDetail(DetailView):
     model = Developer
     template_name = "developersApp/single_developer.html"
     context_object_name = "developer"
-    
+
+
+class deleteDeveloper(DeleteView):
+    model = Developer
+    template_name = "developersApp/deleteDev.html"
+    context_object_name = "developer"
+    success_url = reverse_lazy("addDev")
+
+
+class deleteSkill(DeleteView):
+    model = Skill
+    template_name = "developersApp/deleteSkill.html"
+    context_object_name = "skill"
+    success_url = reverse_lazy("addSkill")
+
+
+class deleteProject(DeleteView):
+    model = Project
+    template_name = "developersApp/deleteProj.html"
+    context_object_name = "project"
+    success_url = reverse_lazy("addProj")
+
+
+class updateDeveloper(UpdateView):
+    model = Developer
+    template_name = "developersApp/update_dev.html"
+    context_object_name = "developer"
+    fields = ["first_name", "last_name", "email", "age"]
+    success_url = reverse_lazy("addDev")
+
+
+class updateProject(UpdateView):
+    model = Project
+    template_name = "developersApp/update_project.html"
+    context_object_name = "project"
+    fields = ["title", "description"]
+    success_url = reverse_lazy("addDev")
+
+
+class updateSkill(UpdateView):
+    model = Skill
+    template_name = "developersApp/update_skill.html"
+    context_object_name = "developer"
+    fields = ['title' ,'description' ]
+    success_url = reverse_lazy("addDev")
+
+
+# from django.db import models
+
+
+# class Project(models.Model):
+#     title = models.CharField(max_length=100)
+#     description = models.TextField()
+#     developers = models.ManyToManyField("Developer", related_name="projects", blank=True)
+#     def __str__(self):
+#         return f"{self.title}"
+
+
+# class Skill(models.Model):
+#     title = models.CharField(max_length=100)
+#     description = models.TextField()
+#     developer = models.ForeignKey(
+#         Developer, on_delete=models.CASCADE, related_name="skills" ,blank=True
+#     )
+
+#     def __str__(self):
+#         return f"{self.title}"

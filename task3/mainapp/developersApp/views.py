@@ -6,6 +6,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import TemplateView, ListView
 from .forms import add_project, add_skill, developer_login
+from django.contrib import messages
 
 # from django.contrib import messages
 
@@ -15,6 +16,14 @@ class developerCreateView(CreateView):
     template_name = "developersApp/add_dev.html"
     form_class = developer_login
     success_url = reverse_lazy("addDev")
+
+    def form_valid(self, form):
+        messages.success(self.request, "adding  was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "adding wasn't successful")
+        return super().form_invalid(form)
 
 
 # def add_developer(request):
@@ -40,6 +49,15 @@ class projectCreateView(CreateView):
     template_name = "developersApp/add_proj.html"
     form_class = add_project
     success_url = reverse_lazy("addProj")
+
+    def form_valid(self, form):
+        messages.success(self.request, "adding  was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "adding wasn't successful")
+        return super().form_invalid(form)
+
     # model.developers.set(form.cleaned_data["developers"])
 
 
@@ -65,6 +83,14 @@ class skillCreateView(CreateView):
     template_name = "developersApp/add_skill.html"
     form_class = add_skill
     success_url = reverse_lazy("addSkill")
+
+    def form_valid(self, form):
+        messages.success(self.request, "adding  was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "adding wasn't successful")
+        return super().form_invalid(form)
 
 
 # def add_skl(request):
@@ -106,6 +132,9 @@ class projectListview(ListView):
     template_name = "developersApp/show_projects.html"
     context_object_name = "projects"
 
+    def get_queryset(self):
+        return super().get_queryset()
+
 
 # def show_projects(request):
 #     projects = Project.objects.all()
@@ -122,6 +151,14 @@ class deleteDeveloper(DeleteView):
     context_object_name = "developer"
     success_url = reverse_lazy("addDev")
 
+    def form_valid(self, form):
+        messages.success(self.request, "deleting was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "deleting wasn't successful")
+        return super().form_invalid(form)
+
 
 class deleteSkill(DeleteView):
     model = Skill
@@ -129,12 +166,28 @@ class deleteSkill(DeleteView):
     context_object_name = "skill"
     success_url = reverse_lazy("addSkill")
 
+    def form_valid(self, form):
+        messages.success(self.request, "deleting was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "deleting wasn't successful")
+        return super().form_invalid(form)
+
 
 class deleteProject(DeleteView):
     model = Project
     template_name = "developersApp/deleteProj.html"
     context_object_name = "project"
     success_url = reverse_lazy("addProj")
+
+    def form_valid(self, form):
+        messages.success(self.request, "deleting was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "deleting wasn't successful")
+        return super().form_invalid(form)
 
 
 class updateDeveloper(UpdateView):
@@ -144,6 +197,14 @@ class updateDeveloper(UpdateView):
     fields = ["first_name", "last_name", "email", "age"]
     success_url = reverse_lazy("addDev")
 
+    def form_valid(self, form):
+        messages.success(self.request, "update was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "update wasn't successful")
+        return super().form_invalid(form)
+
 
 class updateProject(UpdateView):
     model = Project
@@ -152,32 +213,35 @@ class updateProject(UpdateView):
     fields = ["title", "description"]
     success_url = reverse_lazy("addDev")
 
+    def form_valid(self, form):
+        messages.success(self.request, "update was successful")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "update wasn't successful")
+        return super().form_invalid(form)
+
 
 class updateSkill(UpdateView):
     model = Skill
     template_name = "developersApp/update_skill.html"
     context_object_name = "developer"
-    fields = ['title' ,'description' ]
+    fields = ["title", "description"]
     success_url = reverse_lazy("addDev")
 
+    def form_valid(self, form):
+        messages.success(self.request, "update was successful")
+        return super().form_valid(form)
 
-# from django.db import models
-
-
-# class Project(models.Model):
-#     title = models.CharField(max_length=100)
-#     description = models.TextField()
-#     developers = models.ManyToManyField("Developer", related_name="projects", blank=True)
-#     def __str__(self):
-#         return f"{self.title}"
+    def form_invalid(self, form):
+        messages.error(self.request, "update wasn't successful")
+        return super().form_invalid(form)
 
 
-# class Skill(models.Model):
-#     title = models.CharField(max_length=100)
-#     description = models.TextField()
-#     developer = models.ForeignKey(
-#         Developer, on_delete=models.CASCADE, related_name="skills" ,blank=True
-#     )
+class aboveLegalAge(ListView):
+    model = Developer
+    template_name = "developersApp/legalAge.html"
+    context_object_name = "developers"
 
-#     def __str__(self):
-#         return f"{self.title}"
+    def get_queryset(self):
+        return super().get_queryset().filter(age__gte=18)

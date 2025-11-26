@@ -5,4 +5,3 @@ urlpatterns = [
     path('' ,show_users),
     path('<str:username>/' , show_cv , name= 'show_cv')
 ]
-# مشکل url

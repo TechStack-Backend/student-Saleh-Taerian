@@ -1,9 +1,5 @@
 *.sqlite
 *.env
-<<<<<<< HEAD
-*/venv/
-=======
->>>>>>> main
 venv/
 *.pyc
 *.pyo

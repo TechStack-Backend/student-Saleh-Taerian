@@ -1,17 +1,20 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404 , redirect
 from django.urls import reverse_lazy
-from .forms import developer_login, add_project, add_skill
+from .forms import developer_login, add_project, add_skill, userSignup , userSignin
 from .models import Developer, Skill, Project
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import TemplateView, ListView
 from .forms import add_project, add_skill, developer_login
 from django.contrib import messages
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
+from django.views import View
+from django.contrib.auth import authenticate ,login , logout
 # from django.contrib import messages
 
 
-class developerCreateView(CreateView):
+class developerCreateView(LoginRequiredMixin, CreateView):
     model = Developer
     template_name = "developersApp/add_dev.html"
     form_class = developer_login
@@ -43,7 +46,7 @@ class developerCreateView(CreateView):
 #     return render(request, "developersApp/add_dev.html", {"form": form})
 
 
-class projectCreateView(CreateView):
+class projectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     form_class = add_project
     template_name = "developersApp/add_proj.html"
@@ -78,7 +81,7 @@ class projectCreateView(CreateView):
 #     return render(request, "developersApp/add_proj.html", {"form": form})
 
 
-class skillCreateView(CreateView):
+class skillCreateView(LoginRequiredMixin, CreateView):
     model = Skill
     template_name = "developersApp/add_skill.html"
     form_class = add_skill
@@ -109,7 +112,7 @@ class skillCreateView(CreateView):
 #     return render(request, "developersApp/add_skill.html", {"form": form})
 
 
-class developerListView(ListView):
+class developerListView(LoginRequiredMixin, ListView):
     model = Project
     template_name = "developersApp/show_developers.html"
     context_object_name = "projects"
@@ -127,7 +130,7 @@ class developerListView(ListView):
 #     return render(request , 'developersApp/show_developers.html',{'skills':skills})
 
 
-class projectListview(ListView):
+class projectListview(LoginRequiredMixin, ListView):
     model = Project
     template_name = "developersApp/show_projects.html"
     context_object_name = "projects"
@@ -139,13 +142,13 @@ class projectListview(ListView):
 # def show_projects(request):
 #     projects = Project.objects.all()
 #     return render(request , 'developersApp/show_projects.html' , {'projects':projects})
-class developerDetail(DetailView):
+class developerDetail(LoginRequiredMixin, DetailView):
     model = Developer
     template_name = "developersApp/single_developer.html"
     context_object_name = "developer"
 
 
-class deleteDeveloper(DeleteView):
+class deleteDeveloper(LoginRequiredMixin, DeleteView):
     model = Developer
     template_name = "developersApp/deleteDev.html"
     context_object_name = "developer"
@@ -160,7 +163,7 @@ class deleteDeveloper(DeleteView):
         return super().form_invalid(form)
 
 
-class deleteSkill(DeleteView):
+class deleteSkill(LoginRequiredMixin, DeleteView):
     model = Skill
     template_name = "developersApp/deleteSkill.html"
     context_object_name = "skill"
@@ -175,7 +178,7 @@ class deleteSkill(DeleteView):
         return super().form_invalid(form)
 
 
-class deleteProject(DeleteView):
+class deleteProject(LoginRequiredMixin, DeleteView):
     model = Project
     template_name = "developersApp/deleteProj.html"
     context_object_name = "project"
@@ -190,7 +193,7 @@ class deleteProject(DeleteView):
         return super().form_invalid(form)
 
 
-class updateDeveloper(UpdateView):
+class updateDeveloper(LoginRequiredMixin, UpdateView):
     model = Developer
     template_name = "developersApp/update_dev.html"
     context_object_name = "developer"
@@ -206,7 +209,7 @@ class updateDeveloper(UpdateView):
         return super().form_invalid(form)
 
 
-class updateProject(UpdateView):
+class updateProject(LoginRequiredMixin, UpdateView):
     model = Project
     template_name = "developersApp/update_project.html"
     context_object_name = "project"
@@ -222,7 +225,7 @@ class updateProject(UpdateView):
         return super().form_invalid(form)
 
 
-class updateSkill(UpdateView):
+class updateSkill(LoginRequiredMixin, UpdateView):
     model = Skill
     template_name = "developersApp/update_skill.html"
     context_object_name = "developer"
@@ -238,10 +241,44 @@ class updateSkill(UpdateView):
         return super().form_invalid(form)
 
 
-class aboveLegalAge(ListView):
+class aboveLegalAge(LoginRequiredMixin, ListView):
     model = Developer
     template_name = "developersApp/legalAge.html"
     context_object_name = "developers"
 
     def get_queryset(self):
         return super().get_queryset().filter(age__gte=18)
+
+
+class registerUser(CreateView):
+    form_class = userSignup
+    template_name = "developersApp/userSignup.html"
+    success_url = reverse_lazy("userLogin")
+
+
+# class userLogin(View):
+#     template_name = "developersApp/userLogin.html"
+#     def get(self ,request):
+#         form = userSignin()
+#         return render(request , self.template_name ,{'form':form})
+#     def post(self , request):
+#         form = userSignin(request.POST)
+#         if form.is_valid():
+#             userName = form.cleaned_data['userName']
+#             password = form.cleaned_data['password']
+#             user = authenticate(request ,username=userName ,password= password)
+#             if user:
+#                 login(request ,user)
+#                 return redirect("showEachDev")
+#         return render(request , self.template_name ,{'form':form})
+    
+def userLogin(request):
+    if request.method=="POST":
+        form = userSignin(request.POST)
+        if form.is_valid():
+            userName = form.cleaned_data['userName']
+            password = form.cleaned_data['password']
+            user = authenticate(request ,username=userName ,password= password)
+            if user:
+                login(request ,user)
+                return redirect("showEachDev")

@@ -1,8 +1,8 @@
 from django import forms
 from .models import Developer
 from django.forms import ModelForm
-from .models import Developer, Skill, Project
-
+from .models import Developer, Skill, Project , userRegister
+from django.contrib.auth.forms import UserCreationForm
 
 class developer_login(ModelForm):
     class Meta:
@@ -57,3 +57,14 @@ class add_skill(ModelForm):
 #     title = forms.CharField(max_length=100)
 #     description = forms.CharField(max_length=100)
 #     developer  = forms.ModelChoiceField(queryset= Developer.objects.all())
+
+class userSignup(ModelForm):
+    class Meta:
+        model = userRegister
+        fields = ['userName' , 'lastName' , 'password' ,'email' ,'phoneNumber']
+    
+class userSignin(ModelForm):
+    class Meta:
+        model = userRegister
+        fields = ['userName', 'password']
+    

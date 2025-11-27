@@ -13,13 +13,15 @@ from .views import (
     updateDeveloper,
     updateProject,
     updateSkill,
-    aboveLegalAge
+    aboveLegalAge,
+    registerUser,
+    userLogin
 )
 
 urlpatterns = [
-    path("login/dev", developerCreateView.as_view(), name="addDev"),
-    path("login/skill", skillCreateView.as_view(), name="addSkill"),
-    path("login/project", projectCreateView.as_view(), name="addProj"),
+    path("add/dev", developerCreateView.as_view(), name="addDev"),
+    path("add/skill", skillCreateView.as_view(), name="addSkill"),
+    path("add/project", projectCreateView.as_view(), name="addProj"),
     path("developers", developerListView.as_view(), name="ShowDevs"),
     path("projects", projectListview.as_view(), name="showProjs"),
     path("eachDev/<int:pk>", developerDetail.as_view(), name="showEachDev"),
@@ -29,5 +31,8 @@ urlpatterns = [
     path("update/developer/<int:pk>", updateDeveloper.as_view(), name="updateDev"),
     path("update/project/<int:pk>", updateProject.as_view(), name="updateProj"),
     path("update/skill/<int:pk>", updateSkill.as_view(), name="updateSkill"),
-    path("aboveLegalDevs" , aboveLegalAge.as_view() ,name="aboveLegal")
+    path("aboveLegalDevs", aboveLegalAge.as_view(), name="aboveLegal"),
+    path("register/", registerUser.as_view(), name="userSignup"),
+    path("login/", userLogin(), name="userLogin"),
+    
 ]

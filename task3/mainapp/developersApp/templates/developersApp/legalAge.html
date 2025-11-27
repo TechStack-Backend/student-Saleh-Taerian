@@ -6,6 +6,13 @@
     <title>legal age</title>
 </head>
 <body>
+    <h1>my username: {{user.username}}</h1>
+    {%if user.is_authenticated%}
+    <form method="POST" action="{%url 'logout'%}">
+        {%csrf_token%}
+        <button type="submit">logout</button>
+    </form>
+    {%endif%}
     {%for dev in developers%}
     <h1>{{dev.first_name}}</h1>
     {%endfor%}

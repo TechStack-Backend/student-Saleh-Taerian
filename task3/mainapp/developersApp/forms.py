@@ -1,9 +1,9 @@
 from django import forms
 from .models import Developer
 from django.forms import ModelForm
-from .models import Developer, Skill, Project , userRegister
+from .models import Developer, Skill, Project , profile
 from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.models import User
 class developer_login(ModelForm):
     class Meta:
         model = Developer
@@ -14,13 +14,6 @@ class developer_login(ModelForm):
         if age < 18:
             raise forms.ValidationError("age must not be under 18")
         return age
-
-
-# class developer_login(forms.Form):
-#     first_name = forms.CharField(max_length=100)
-#     last_name = forms.CharField(max_length=100)
-#     email = forms.CharField(max_length=100)
-#     age = forms.IntegerField()
 
 
 class add_project(ModelForm):
@@ -36,10 +29,6 @@ class add_project(ModelForm):
         return description
 
 
-# class add_project(forms.Form):
-#     title = forms.CharField(max_length=100)
-#     description = forms.CharField(max_length=100)
-#     developers = forms.ModelMultipleChoiceField(queryset=Developer.objects.all() , widget = forms.CheckboxSelectMultiple)
 
 
 class add_skill(ModelForm):
@@ -60,11 +49,10 @@ class add_skill(ModelForm):
 
 class userSignup(ModelForm):
     class Meta:
-        model = userRegister
-        fields = ['userName' , 'lastName' , 'password' ,'email' ,'phoneNumber']
+        model = User
+        fields = ['username' , 'last_name' , 'password' ,'email']
     
-class userSignin(ModelForm):
+class profileForm(ModelForm):
     class Meta:
-        model = userRegister
-        fields = ['userName', 'password']
-    
+        model = profile
+        fields = ['bio' ,'profile_picture']

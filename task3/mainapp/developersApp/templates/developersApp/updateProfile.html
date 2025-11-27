@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>developer</title>
+    <title>update profile</title>
 </head>
+
 <body>
     <h1>my username: {{user.username}}</h1>
     {%if user.is_authenticated%}
-    <form method="POST" action="{%url 'logout'%}">
+    <form method="POST" action="{%url 'logout'%}" >
         {%csrf_token%}
         <button type="submit">logout</button>
     </form>
     {%endif%}
-    <h1>{{developer.first_name}}</h1>
-    <h2>{{developer.last_name}}</h2>
-    <h2>{{developer.email}}</h2>
-    <h2>{{developer.age}}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {%csrf_token%}
+        {{form.as_p}}
+        <input type="submit" value="submit">
+    </form>
 </body>
+
 </html>

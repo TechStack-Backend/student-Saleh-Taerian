@@ -1,16 +1,18 @@
-from django.shortcuts import render, get_object_or_404 , redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from .forms import developer_login, add_project, add_skill, userSignup , userSignin
-from .models import Developer, Skill, Project
+from .forms import developer_login, add_project, add_skill, userSignup
+from .models import Developer, Skill, Project, profile
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import TemplateView, ListView
-from .forms import add_project, add_skill, developer_login
+from .forms import add_project, add_skill, developer_login, profileForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
-from django.views import View
-from django.contrib.auth import authenticate ,login , logout
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+
+
 # from django.contrib import messages
 
 
@@ -250,10 +252,10 @@ class aboveLegalAge(LoginRequiredMixin, ListView):
         return super().get_queryset().filter(age__gte=18)
 
 
-class registerUser(CreateView):
-    form_class = userSignup
-    template_name = "developersApp/userSignup.html"
-    success_url = reverse_lazy("userLogin")
+# class registerUser(CreateView):
+#     form_class = userSignup
+#     template_name = "developersApp/userSignup.html"
+#     success_url = reverse_lazy("userLogin")
 
 
 # class userLogin(View):
@@ -271,14 +273,34 @@ class registerUser(CreateView):
 #                 login(request ,user)
 #                 return redirect("showEachDev")
 #         return render(request , self.template_name ,{'form':form})
-    
-def userLogin(request):
-    if request.method=="POST":
-        form = userSignin(request.POST)
-        if form.is_valid():
-            userName = form.cleaned_data['userName']
-            password = form.cleaned_data['password']
-            user = authenticate(request ,username=userName ,password= password)
-            if user:
-                login(request ,user)
-                return redirect("showEachDev")
+
+
+class userSignup(CreateView):
+    model = User
+    form_class = userSignup
+    template_name = "developersApp/userSignup.html"
+
+    def get_success_url(self):
+        return reverse_lazy("userLogin")
+
+
+class userSignin(LoginView):
+    template_name = "developersApp/userLogin.html"
+    redirect_authenticated_user = True
+
+
+class userLogout(LogoutView):
+    next_page = reverse_lazy("userLogin")
+
+
+class updateProfile(LoginRequiredMixin, UpdateView):
+    template_name = "developersApp/updateProfile.html"
+    model = profile
+    form_class = profileForm
+    success_url = reverse_lazy("updateProfile")
+    def get_object(self):
+        prof, created = profile.objects.get_or_create(user = self.request.user)
+        return prof
+
+class myProfile(LoginRequiredMixin ,TemplateView):
+    template_name = "developersApp/myProfile.html"

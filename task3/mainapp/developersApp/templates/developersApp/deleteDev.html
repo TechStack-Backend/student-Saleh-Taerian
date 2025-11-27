@@ -8,6 +8,13 @@
 </head>
 
 <body>
+    <h1>my username: {{user.username}}</h1>
+    {%if user.is_authenticated%}
+    <form method="POST" action="{%url 'logout'%}">
+        {%csrf_token%}
+        <button type="submit">logout</button>
+    </form>
+    {%endif%}
     {% if messages %}
     <ul>
         {%for message in messages%}

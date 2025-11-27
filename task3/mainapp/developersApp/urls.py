@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import (
     projectCreateView,
     developerCreateView,
@@ -14,8 +17,11 @@ from .views import (
     updateProject,
     updateSkill,
     aboveLegalAge,
-    registerUser,
-    userLogin
+    userSignup,
+    userSignin,
+    userLogout,
+    updateProfile,
+    myProfile,
 )
 
 urlpatterns = [
@@ -32,7 +38,11 @@ urlpatterns = [
     path("update/project/<int:pk>", updateProject.as_view(), name="updateProj"),
     path("update/skill/<int:pk>", updateSkill.as_view(), name="updateSkill"),
     path("aboveLegalDevs", aboveLegalAge.as_view(), name="aboveLegal"),
-    path("register/", registerUser.as_view(), name="userSignup"),
-    path("login/", userLogin(), name="userLogin"),
-    
+    path("register/", userSignup.as_view(), name="userSignup"),
+    path("login/", userSignin.as_view(), name="userLogin"),
+    path("logout/", userLogout.as_view(), name="logout"),
+    path("update/profile", updateProfile.as_view(), name="updateProfile"),
+    path("myProfile/", myProfile.as_view(), name="myProfile"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

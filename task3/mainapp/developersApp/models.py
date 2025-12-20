@@ -18,7 +18,8 @@ class Project(models.Model):
     developers = models.ManyToManyField(
         "Developer", related_name="projects", blank=True
     )
-
+    class Meta:
+        permissions = [("do_Project" , "can do project")]
     def __str__(self):
         return f"{self.title}"
 

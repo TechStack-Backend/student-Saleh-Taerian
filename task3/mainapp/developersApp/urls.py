@@ -22,6 +22,7 @@ from .views import (
     userLogout,
     updateProfile,
     myProfile,
+    show_devs
 )
 
 urlpatterns = [
@@ -43,6 +44,7 @@ urlpatterns = [
     path("logout/", userLogout.as_view(), name="logout"),
     path("update/profile", updateProfile.as_view(), name="updateProfile"),
     path("myProfile/", myProfile.as_view(), name="myProfile"),
+    path("showDevs/" ,show_devs ,  name="showDevs")
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

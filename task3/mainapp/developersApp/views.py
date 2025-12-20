@@ -11,8 +11,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-
-
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from functools import wraps
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
 # from django.contrib import messages
 
 
@@ -132,10 +135,11 @@ class developerListView(LoginRequiredMixin, ListView):
 #     return render(request , 'developersApp/show_developers.html',{'skills':skills})
 
 
-class projectListview(LoginRequiredMixin, ListView):
+class projectListview(LoginRequiredMixin,PermissionRequiredMixin , ListView):
     model = Project
     template_name = "developersApp/show_projects.html"
     context_object_name = "projects"
+    permission_required = "developersApp.do_Project"
 
     def get_queryset(self):
         return super().get_queryset()
@@ -298,9 +302,42 @@ class updateProfile(LoginRequiredMixin, UpdateView):
     model = profile
     form_class = profileForm
     success_url = reverse_lazy("updateProfile")
+
     def get_object(self):
-        prof, created = profile.objects.get_or_create(user = self.request.user)
+        prof, created = profile.objects.get_or_create(user=self.request.user)
         return prof
 
-class myProfile(LoginRequiredMixin ,TemplateView):
+
+class myProfile(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    raise_exception = True
     template_name = "developersApp/myProfile.html"
+
+
+@permission_required("developersApp.view_Developer" , raise_exception=True)
+def show_devs(request):
+    developers = Developer.objects.all()
+    return render(request, "show_developers.html", {"devs": developers})
+
+def owner_required(model , id):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(request , *args , **kwargs):
+            obj = model.objects.get(pk = kwargs[id])
+            if(obj.developer != request.user):
+                return HttpResponseForbidden
+            return func(request , *args , **kwargs)
+        return wrapper
+    return decorator
+
+# class OwnerOrPermissionMixin:
+#     permission_required  = None
+#     def is_authorized(self):
+#         obj = self.get_object()
+#         user = self.request.user
+#         if obj.developer==user or (user.has_perm(self.permission_required) and permission_required):
+#             return True
+#         return False
+#     def dispatch(self , request , *args , **kwargs):
+#         if not self.is_authorized:
+#             return PermissionDenied
+#         return super().dispatch(self , request , *args , **kwargs)

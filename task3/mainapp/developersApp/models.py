@@ -7,6 +7,8 @@ class Developer(models.Model):
     last_name = models.CharField(max_length=50)
     email = models.CharField(max_length=100)
     age = models.IntegerField()
+    class Meta:
+        permissions = [("can_edit_own_profile","can edit own profile"),("can_edit_own_Prject" , "can edit own Prject")]
 
     def __str__(self):
         return f"{self.first_name}"

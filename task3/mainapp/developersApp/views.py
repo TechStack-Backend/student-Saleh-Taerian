@@ -16,6 +16,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from functools import wraps
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseForbidden
+
 # from django.contrib import messages
 
 
@@ -135,7 +136,7 @@ class developerListView(LoginRequiredMixin, ListView):
 #     return render(request , 'developersApp/show_developers.html',{'skills':skills})
 
 
-class projectListview(LoginRequiredMixin,PermissionRequiredMixin , ListView):
+class projectListview(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Project
     template_name = "developersApp/show_projects.html"
     context_object_name = "projects"
@@ -215,6 +216,7 @@ class updateDeveloper(LoginRequiredMixin, UpdateView):
         return super().form_invalid(form)
 
 
+# 1
 class updateProject(LoginRequiredMixin, UpdateView):
     model = Project
     template_name = "developersApp/update_project.html"
@@ -229,6 +231,13 @@ class updateProject(LoginRequiredMixin, UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, "update wasn't successful")
         return super().form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not self.request.user.has_perm("Project.can_edit_own_Project", obj):
+            return PermissionDenied
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
 
 class updateSkill(LoginRequiredMixin, UpdateView):
@@ -307,27 +316,38 @@ class updateProfile(LoginRequiredMixin, UpdateView):
         prof, created = profile.objects.get_or_create(user=self.request.user)
         return prof
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not self.request.user.has_perm("profile.can_edit_own_profile", obj):
+            return PermissionDenied
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
 
 class myProfile(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     raise_exception = True
     template_name = "developersApp/myProfile.html"
 
 
-@permission_required("developersApp.view_Developer" , raise_exception=True)
+@permission_required("developersApp.view_Developer", raise_exception=True)
 def show_devs(request):
     developers = Developer.objects.all()
     return render(request, "show_developers.html", {"devs": developers})
 
-def owner_required(model , id):
+
+def owner_required(model, id):
     def decorator(func):
         @wraps(func)
-        def wrapper(request , *args , **kwargs):
-            obj = model.objects.get(pk = kwargs[id])
-            if(obj.developer != request.user):
+        def wrapper(request, *args, **kwargs):
+            obj = model.objects.get(pk=kwargs[id])
+            if obj.developer != request.user:
                 return HttpResponseForbidden
-            return func(request , *args , **kwargs)
+            return func(request, *args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 # class OwnerOrPermissionMixin:
 #     permission_required  = None
@@ -341,3 +361,4 @@ def owner_required(model , id):
 #         if not self.is_authorized:
 #             return PermissionDenied
 #         return super().dispatch(self , request , *args , **kwargs)
+
